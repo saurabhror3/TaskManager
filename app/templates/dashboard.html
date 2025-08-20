@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>My Tasks</h2>
+    <a href="{{ url_for('main.new_task') }}" class="btn btn-success">+ Add Task</a>
+  </div>
+
+  {% if tasks %}
+    <div class="list-group">
+      {% for task in tasks %}
+        <div class="list-group-item d-flex justify-content-between align-items-center {% if task.is_completed %}list-group-item-success{% endif %}">
+          <div>
+            <h5 class="mb-1">{{ task.title }}</h5>
+            <small>
+              Due: {{ task.due_date.strftime('%Y-%m-%d %H:%M') if task.due_date else 'No deadline' }} |
+              Priority: {{ task.priority }} |
+              Category: {{ task.category.name if task.category else 'None' }} |
+              Status: {{ 'Completed' if task.is_completed else 'Pending' }}
+            </small>
+          </div>
+          <div>
+            <a href="{{ url_for('main.toggle_task', task_id=task.id) }}" class="btn btn-sm btn-outline-primary">
+              {% if task.is_completed %}Mark Pending{% else %}Mark Complete{% endif %}
+            </a>
+            <a href="{{ url_for('main.update_task', task_id=task.id) }}" class="btn btn-sm btn-warning">Edit</a>
+            <form action="{{ url_for('main.delete_task', task_id=task.id) }}" method="POST" class="d-inline">
+              <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this task?');">Delete</button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No tasks found. Start by <a href="{{ url_for('main.new_task') }}">adding a new task</a>.</p>
+  {% endif %}
+{% endblock %}
